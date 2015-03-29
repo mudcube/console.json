@@ -1,4 +1,4 @@
-Proof of concept for JSON syntax highlighting in the browser console. Great for debugging :) 
+**console.json()**—*Proof of concept for JSON syntax highlighting in the browser console. Great for debugging :)*
 
 This is not entirely perfect, but gets the job done!
 
