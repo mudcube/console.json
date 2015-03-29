@@ -1,7 +1,17 @@
 console.json = function(json) {
-	var background = '; background: #333; padding: 2px 0;';
+	var template = {
+		'background': '#333',
+		'default': '#777',
+		'string': '#B0DC19',
+		'boolean': '#80DEF9',
+		'number': '#FA9D11',
+		'null': '#D93B6C',
+		'undefined': '#D93B6C'
+	};
+	///
+	var background = '; background: ' + template.background + '; padding: 2px 0;';
 	var paddingRight = 'padding-right: 10px;';
-	var defaultColor = '#777';
+	var defaultColor = template.default;
 	///
 	var printBracket = function(indent, value, suffix) {
 		console.log(
@@ -9,23 +19,20 @@ console.json = function(json) {
 			'color: ' + defaultColor + background + paddingRight
 		);
 	};
-	
-    var printVariable = function(indent, key, value, suffix) {
+
+	var printVariable = function(indent, key, value, suffix) {
 		var color = defaultColor;
-		switch(typeof value) {
+		var type = typeof value;
+		switch (type) {
 			case 'string':
-				color = '#B0DC19'; // string
+				color = template.string;
 				value = '"' + value + '"';
 				break;
-			case 'boolean':
-				color = '#80DEF9'; // boolean
+			case 'object':
+				color = template.null;
 				break;
-			case 'number':
-				color = '#FA9D11'; // number
-				break;
-			case 'object': // null
-			case 'undefined':
-				color = '#D93B6C';
+			default:
+				color = template[type];
 				break;
 		}
 		console.log(
@@ -36,12 +43,12 @@ console.json = function(json) {
 		);
 	};
 	///
-    var recurse = function(data, indent) {
+	var recurse = function(data, indent) {
 		var prev;
 		var vindent = indent + '\t';
 		///
 		if (Array.isArray(data)) {
-			for (var n = 0, len = data.length; n < len; n ++) {
+			for (var n = 0, len = data.length; n < len; n++) {
 				var key = n + ':';
 				var value = data[n];
 				var suffix = n === len - 1 ? '' : ',';
@@ -64,7 +71,7 @@ console.json = function(json) {
 						recurse(value, vindent);
 					}
 					prev = undefined;
-				} else { 
+				} else {
 					prev = [vindent, '"' + key + '":', value];
 				}
 			}
@@ -75,6 +82,7 @@ console.json = function(json) {
 		}
 	};
 	///
-    printBracket('', '{');
-    recurse(json, '');
+	printBracket('', '{');
+	///
+	recurse(json, '');
 };
