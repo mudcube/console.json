@@ -6,4 +6,6 @@ This is not entirely perfect, but gets the job done!
 
 To use simply include in your project and type into the console:
 
+<pre>
 console.json({helloWorld: true})
+</pre>
