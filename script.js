@@ -1,32 +1,29 @@
 console.json = function(json) {
-	var template = {
-		'background': '#333',
-		'default': '#777',
-		'string': '#B0DC19',
-		'boolean': '#80DEF9',
-		'number': '#FA9D11',
-		'null': '#D93B6C',
-		'undefined': '#D93B6C'
-	};
-	///
-	var background = '; background: ' + template.background + '; padding: 2px 0;';
-	var paddingRight = 'padding-right: 10px;';
-	var defaultColor = template.default;
-	///
-	var printBracket = function(indent, value, suffix) {
-		console.log(
-			'%c ' + indent + value + (suffix || ''), 
-			'color: ' + defaultColor + background + paddingRight
-		);
-	};
 
-	var printVariable = function(indent, key, value, suffix) {
-		var color = defaultColor;
-		var type = typeof value;
-		switch (type) {
+	var template = {
+		'background': 'background: #333;',
+		'default': 'color: #777;',
+		'string': 'color: #B0DC19;',
+		'boolean': 'color: #80DEF9;',
+		'number': 'color: #FA9D11;',
+		'null': 'color: #D93B6C;',
+		'undefined': 'color: #D93B6C;'
+	};
+	///
+	var background = template.background + '; padding: 2px 0;';
+	var paddingRight = 'padding-right: 10px;';
+	///
+	var log = function(indent, type, arg1, arg2, arg3) {
+		var stylePrefix = template.default + background;
+		var styleSuffix = template.default + background + paddingRight;
+		///
+		switch(type) {
+			case 'default':
+				console.log('%c' + indent + arg1, styleSuffix);
+				return;
 			case 'string':
 				color = template.string;
-				value = '"' + value + '"';
+				arg2 = '"' + arg2 + '"';
 				break;
 			case 'object':
 				color = template.null;
@@ -36,53 +33,56 @@ console.json = function(json) {
 				break;
 		}
 		console.log(
-			'%c' + indent + key + '%c ' + value + '%c' + (suffix || ''), 
-			'color: ' + defaultColor + background, 
-			'color: ' + color + background, 
-			'color: ' + defaultColor + background + paddingRight
+			'%c' + indent + arg1 + '%c' + arg2 + '%c' + (arg3 || ''), 
+			stylePrefix, color + background, styleSuffix
 		);
 	};
 	///
-	var recurse = function(data, indent) {
-		var prev;
-		var vindent = indent + '\t';
+	var processObject = function(data, vindent) {
+		var printBuffer = function(addComma) {
+			if (buffer) {
+				if (addComma) {
+					if (buffer[1] === 'default') {
+						buffer[2] += ',';
+					} else {
+						buffer.push(',');
+					}
+				}
+				log.apply(null, buffer);
+			}
+		};
+		
+		var processArg = function(key, value) {
+			printBuffer(true);
+			if (value && typeof value === 'object') {
+				var suffix = Array.isArray(value) ? '[' : '{';
+				log(indent, 'default', key + suffix);
+				buffer = processObject(value, indent);
+			} else {
+				buffer = [indent, typeof value, key, value];
+			}
+		};
+		///
+		var buffer;
+		var indent = vindent + '\t';
 		///
 		if (Array.isArray(data)) {
-			for (var n = 0, len = data.length; n < len; n++) {
-				var key = n + ':';
-				var value = data[n];
-				var suffix = n === len - 1 ? '' : ',';
-				printVariable(vindent, key, value, suffix);
+			var suffix = ']';
+			for (var idx = 0, length = data.length; idx < length; idx++) {
+				processArg(idx + ':', data[idx]);
 			}
-			printBracket(indent, ']');
 		} else {
-			for (var key in data) {
-				if (prev) {
-					prev.push(',');
-					printVariable.apply(null, prev);
-				}
-				var value = data[key];
-				if (value && typeof value === 'object') {
-					if (Array.isArray(value)) {
-						printBracket(vindent, '"' + key + '"', ': [');
-						recurse(value, vindent);
-					} else {
-						printBracket(vindent, '"' + key + '"', ': {');
-						recurse(value, vindent);
-					}
-					prev = undefined;
-				} else {
-					prev = [vindent, '"' + key + '":', value];
-				}
+			var suffix = '}';
+			for (var idx in data) {
+				processArg('"' + idx + '": ', data[idx]);
 			}
-			if (prev) {
-				printVariable.apply(null, prev);
-			}
-			printBracket(indent, '}');
 		}
+		///
+		printBuffer(false);
+		return [vindent, 'default', suffix];
 	};
 	///
-	printBracket('', '{');
-	///
-	recurse(json, '');
+	log('', 'default', '{');
+	log.apply(null, processObject(json, ''));
+
 };
