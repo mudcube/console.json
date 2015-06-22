@@ -32,7 +32,7 @@ console.json({
 	'number': 42,
 	'null': null,
 	'undefined': undefined,
-	'array': ['m', 'u', 'd'],
+	'array': ['a', 'b', 'c'],
 	'object': {
 		'caterpillar': 'butterfly'
 	}
