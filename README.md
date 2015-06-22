@@ -1,8 +1,8 @@
 **console.json()**
 
-*JSON syntax highlighting in the browser console.*
+*JSON syntax highlighting in the browser console :)*
 
-*Great for debugging!*
+*Useful for quick debugging!*
 
 **Usage**
 
