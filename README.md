@@ -4,7 +4,7 @@
 
 To use simply include in your project and type into the console:
 
-<pre>
+```js
 console.json({
 	'string': 'testing',
 	'boolean': true,
@@ -17,8 +17,8 @@ console.json({
 		'key': 'value'
 	}
 });
-</pre>
+```
 
 Result:
 
-<img src="https://raw.githubusercontent.com/mudcube/console.json/master/screenshot.png" width="192" />
+<img src="https://raw.githubusercontent.com/mudcube/console.json/master/screenshot.png" />
