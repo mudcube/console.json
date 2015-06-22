@@ -10,7 +10,7 @@
 */
 
 console.json = function(object, depth, delimiter) {
-	depth = depth || 10; //- implement me to prevent recursion
+	depth = depth || 7;
 	delimiter = delimiter || '\t';
 
 	var template = {
@@ -21,28 +21,31 @@ console.json = function(object, depth, delimiter) {
 		'function': 'color: #EC5f67;', // red
 		'number': 'color: #FAC863;', // yellow
 		'null': 'color: #F99157;', // orange
-		'undefined': 'color: #C594C5;' // purple
+		'undefined': 'color: #C594C5;', // purple
+		'overflow': 'color: #EC5f67;' // red
 	};
 
 	function log(indent, type, arg1, arg2, arg3) {
 		var background = template.background + '; padding: 3px 0;';
 		var paddingRight = 'padding-right: 10px;';
-		var stylePrefix = template.default + background;
-		var styleSuffix = template.default + background + paddingRight;
+		var stylePrefix = template['default'] + background;
+		var styleSuffix = template['default'] + background + paddingRight;
 		///
 		switch(type) {
 			case 'default':
-				console.log('%c' + indent + arg1, styleSuffix);
+			case 'overflow':
+				color = template[type];
+				console.log('%c' + indent + arg1 + '%c', color + background, styleSuffix);
 				return;
 			case 'string':
-				color = template['string'];
+				color = template[type];
 				arg2 = '"' + arg2 + '"';
 				break;
 			case 'object':
 				color = template['null'];
 				break;
 			case 'function':
-				color = template['function'];
+				color = template[type];
 				arg2 = 'function(){},';
 				break;
 			default:
@@ -51,12 +54,23 @@ console.json = function(object, depth, delimiter) {
 		}
 		///
 		console.log(
-			'%c' + indent + arg1 + '%c' + arg2 + '%c' + (arg3 || ''), 
+			'%c' + indent + arg1 + '%c' + (arg2 || '') + '%c' + (arg3 || ''), 
 			stylePrefix, color + background, styleSuffix
 		);
 	};
 
-	function processObject(data, vindent) {
+	function processObject(data, _indent) {
+	
+		var buffer;
+		var indent = _indent + delimiter;
+		var isarray = Array.isArray(data);
+		var suffix = isarray ? ']' : '}';
+		///
+		if (_indent.length / delimiter.length === depth) {
+			log(indent, 'overflow', '...');
+			return [_indent, 'default', suffix];
+		}
+	
 		function printBuffer(addComma) {
 			if (buffer) {
 				if (addComma) {
@@ -81,23 +95,18 @@ console.json = function(object, depth, delimiter) {
 			}
 		};
 		///
-		var buffer;
-		var indent = vindent + delimiter;
-		///
-		if (Array.isArray(data)) {
-			var suffix = ']';
+		if (isarray) {
 			for (var idx = 0, length = data.length; idx < length; idx++) {
 				processArg(idx + ': ', data[idx]);
 			}
 		} else {
-			var suffix = '}';
 			for (var idx in data) {
 				processArg('"' + idx + '": ', data[idx]);
 			}
 		}
 		///
 		printBuffer(false);
-		return [vindent, 'default', suffix];
+		return [_indent, 'default', suffix];
 	};
 	///
 	log('', 'default', '{');
