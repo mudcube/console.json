@@ -6,16 +6,19 @@ To use simply include in your project and type into the console:
 
 <pre>
 console.json({
-    a: 'hello world',
-    b: {
-        key: 'value'
-    },
-    c: [3, 2, 1],
-    d: 1,
-    e: true,
-    f: undefined,
-    g: null
-})
+	'string': 'testing',
+	'boolean': true,
+	'function': function() {},
+	'number': 3123,
+	'null': null,
+	'undefined': undefined,
+	'array': ['a', 'b', 'c'],
+	'object': {
+		'key': 'value'
+	}
+});
 </pre>
 
-<img src="https://raw.githubusercontent.com/mudcube/console.json/master/example.png" width="192" />
+Result:
+
+<img src="https://raw.githubusercontent.com/mudcube/console.json/master/screenshot.png" width="192" />
