@@ -60,17 +60,44 @@ console.json = function(object, depth, delimiter) {
 	};
 
 	function processObject(data, _indent) {
-	
-		var buffer;
 		var indent = _indent + delimiter;
 		var isarray = Array.isArray(data);
 		var suffix = isarray ? ']' : '}';
 		///
-		if (_indent.length / delimiter.length === depth) {
+		if (_indent.length / delimiter.length === depth) { // max depth
 			log(indent, 'overflow', '...');
 			return [_indent, 'default', suffix];
+		} else {
+			var buffer;
+			if (isarray) {
+				for (var idx = 0, length = data.length; idx < length; idx++) {
+					processArg(idx + ': ', data[idx]);
+				}
+			} else {
+				for (var idx in data) {
+					if (data.hasOwnProperty(idx)) {
+						processArg('"' + idx + '": ', data[idx]);
+					}
+				}
+			}
+			///
+			printBuffer(false);
+			///
+			return [_indent, 'default', suffix];
 		}
-	
+
+		function processArg(key, value) {
+			printBuffer(true);
+			///
+			if (value && typeof value === 'object') {
+				var suffix = Array.isArray(value) ? '[' : '{';
+				log(indent, 'default', key + suffix);
+				buffer = processObject(value, indent);
+			} else {
+				buffer = [indent, typeof value, key, value];
+			}
+		};
+
 		function printBuffer(addComma) {
 			if (buffer) {
 				if (addComma) {
@@ -83,30 +110,6 @@ console.json = function(object, depth, delimiter) {
 				log.apply(null, buffer);
 			}
 		};
-		
-		function processArg(key, value) {
-			printBuffer(true);
-			if (value && typeof value === 'object') {
-				var suffix = Array.isArray(value) ? '[' : '{';
-				log(indent, 'default', key + suffix);
-				buffer = processObject(value, indent);
-			} else {
-				buffer = [indent, typeof value, key, value];
-			}
-		};
-		///
-		if (isarray) {
-			for (var idx = 0, length = data.length; idx < length; idx++) {
-				processArg(idx + ': ', data[idx]);
-			}
-		} else {
-			for (var idx in data) {
-				processArg('"' + idx + '": ', data[idx]);
-			}
-		}
-		///
-		printBuffer(false);
-		return [_indent, 'default', suffix];
 	};
 	///
 	log('', 'default', '{');
