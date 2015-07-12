@@ -53,8 +53,11 @@ console.json = function(object, depth, delimiter) {
 				break;
 		}
 		///
+		if (typeof arg2 === 'undefined') arg2 = 'undefined';
+		if (typeof arg3 === 'undefined') arg3 = '';
+		///
 		console.log(
-			'%c' + indent + arg1 + '%c' + (arg2 || '') + '%c' + (arg3 || ''), 
+			'%c' + indent + arg1 + '%c' + arg2 + '%c' + arg3,
 			stylePrefix, color + background, styleSuffix
 		);
 	};
